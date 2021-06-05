@@ -1,40 +1,25 @@
 const models = require('../models')
 
 const getAllAuthors = async (request, response) => {
-  try {
-    const authors = await models.authors.findAll({
-      attributes: ['id', 'nameFirst', 'nameLast', 'createdAt', 'updatedAt']
-    })
+  const authors = await models.authors.findAll()
 
-    return authors ? response.send(authors) : response.status(500)
-  } catch (error) {
-    return response.status(500).send('Not able to retrieve authors, please try agin')
-  }
+  return response.send(authors)
 }
 
 const getAuthorsById = async (request, response) => {
-  try {
-    const { id } = request.params
+  const { id } = request.params
 
-    const foundAuthor = await models.authors.findOne({
-      attributes: ['id', 'nameFirst', 'nameLast', 'createdAt', 'updatedAt'],
-      where: { id },
-      include: [{
-        model: models.novels,
-        attributes: ['id', 'title', 'authorId', 'createdAt', 'updatedAt'],
-        include: [{
-          model: models.genres,
-          attributes: ['id', 'name', 'createdAt', 'updatedAt']
-        }]
-      }]
-    })
+  const author = await models.authors.findOne({
+    where: { id },
+    include: [{
+      model: models.novels,
+      include: [{ model: models.genres }]
+    }]
+  })
 
-    return foundAuthor
-      ? response.send(foundAuthor)
-      : response.sendStatus(404)
-  } catch (error) {
-    return response.status(500).send('Not able to retrieve author, please try agian')
-  }
+  return author
+    ? response.send(author)
+    : response.sendStatus(404)
 }
 
 module.exports = { getAllAuthors, getAuthorsById }
