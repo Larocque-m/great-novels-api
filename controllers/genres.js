@@ -1,7 +1,7 @@
 const models = require('../models')
 
 const getAllGenres = async (request, response) => {
-  const genres = await models.genres.findAll()
+  const genres = await models.genres.findAll({ attributes: ['id', 'name', 'createdAt', 'updatedAt'] })
 
   return response.send(genres)
 }
