@@ -10,7 +10,13 @@ const getAuthorsById = async (request, response) => {
   const { id } = request.params
 
   const author = await models.authors.findOne({
-    where: { id },
+    where: {
+      [models.Sequelize.Op.or]: [
+        { id: id },
+        { nameLast: { [models.Sequelize.Op.like]: `%${id}%` } },
+        { nameFirst: { [models.Sequelize.Op.like]: `%${id}%` } },
+      ]
+    },
     include: [{
       model: models.novels,
       include: [{ model: models.genres }]
